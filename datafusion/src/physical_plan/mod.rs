@@ -506,6 +506,7 @@ pub trait WindowExpr: Send + Sync + Debug {
             }])
         } else {
             lexicographical_partition_ranges(partition_columns)
+                .map(|iter| iter.collect())
                 .map_err(DataFusionError::ArrowError)
         }
     }
