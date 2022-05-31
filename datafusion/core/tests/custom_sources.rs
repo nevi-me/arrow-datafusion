@@ -39,6 +39,7 @@ use datafusion::physical_plan::{
     SendableRecordBatchStream, Statistics,
 };
 
+use datafusion_expr::TableSource;
 use futures::stream::Stream;
 use std::any::Any;
 use std::pin::Pin;
@@ -46,7 +47,7 @@ use std::sync::Arc;
 use std::task::{Context, Poll};
 
 use async_trait::async_trait;
-use datafusion::logical_plan::plan::Projection;
+use datafusion::logical_plan::plan::{DefaultTableSource, Projection};
 
 //// Custom source dataframe tests ////
 
@@ -197,6 +198,10 @@ impl TableProvider for CustomTableProvider {
 
     fn table_type(&self) -> TableType {
         TableType::Base
+    }
+
+    fn as_source(self: Arc<Self>) -> Arc<dyn TableSource> {
+        Arc::new(DefaultTableSource::new(self))
     }
 
     async fn scan(

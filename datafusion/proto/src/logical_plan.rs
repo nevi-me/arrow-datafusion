@@ -24,7 +24,7 @@ use crate::{
     to_proto,
 };
 use arrow::datatypes::Schema;
-use datafusion::prelude::SessionContext;
+use datafusion::{datasource::TableProvider, prelude::SessionContext};
 use datafusion::{
     datasource::{
         file_format::{
@@ -32,7 +32,7 @@ use datafusion::{
         },
         listing::{ListingOptions, ListingTable, ListingTableConfig, ListingTableUrl},
     },
-    logical_plan::{provider_as_source, source_as_provider},
+    logical_plan::source_as_provider,
 };
 use datafusion_common::{Column, DataFusionError};
 use datafusion_expr::{
@@ -436,7 +436,7 @@ impl AsLogicalPlan for LogicalPlanNode {
 
                 LogicalPlanBuilder::scan_with_filters(
                     &scan.table_name,
-                    provider_as_source(Arc::new(provider)),
+                    Arc::new(provider).as_source(),
                     projection,
                     filters,
                 )?

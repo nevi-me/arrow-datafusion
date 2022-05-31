@@ -22,8 +22,9 @@ use datafusion::{
         schema::{MemorySchemaProvider, SchemaProvider},
     },
     datasource::{TableProvider, TableType},
-    logical_plan::Expr,
+    logical_plan::{plan::DefaultTableSource, Expr},
 };
+use datafusion_expr::TableSource;
 
 use super::*;
 
@@ -171,6 +172,10 @@ async fn information_schema_tables_table_types() {
 
         fn schema(&self) -> SchemaRef {
             unimplemented!()
+        }
+
+        fn as_source(self: Arc<Self>) -> Arc<dyn TableSource> {
+            Arc::new(DefaultTableSource::new(self))
         }
 
         async fn scan(

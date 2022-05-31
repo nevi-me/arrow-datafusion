@@ -21,11 +21,12 @@ use std::{any::Any, sync::Arc};
 
 use arrow::datatypes::SchemaRef;
 use async_trait::async_trait;
+use datafusion_expr::TableSource;
 
 use crate::{
     error::Result,
     execution::context::SessionContext,
-    logical_plan::{Expr, LogicalPlan},
+    logical_plan::{plan::DefaultTableSource, Expr, LogicalPlan},
     physical_plan::ExecutionPlan,
 };
 
@@ -69,6 +70,10 @@ impl TableProvider for ViewTable {
 
     fn table_type(&self) -> TableType {
         TableType::View
+    }
+
+    fn as_source(self: Arc<Self>) -> Arc<dyn TableSource> {
+        Arc::new(DefaultTableSource::new(self))
     }
 
     async fn scan(

@@ -23,7 +23,9 @@ use datafusion::dataframe::DataFrame;
 use datafusion::datasource::{TableProvider, TableType};
 use datafusion::error::Result;
 use datafusion::execution::context::TaskContext;
-use datafusion::logical_plan::{provider_as_source, Expr, LogicalPlanBuilder};
+use datafusion::logical_expr::TableSource;
+use datafusion::logical_plan::plan::DefaultTableSource;
+use datafusion::logical_plan::{Expr, LogicalPlanBuilder};
 use datafusion::physical_plan::expressions::PhysicalSortExpr;
 use datafusion::physical_plan::memory::MemoryStream;
 use datafusion::physical_plan::{
@@ -62,7 +64,7 @@ async fn search_accounts(
     // create logical plan composed of a single TableScan
     let logical_plan = LogicalPlanBuilder::scan_with_filters(
         "accounts",
-        provider_as_source(Arc::new(db)),
+        Arc::new(db).as_source(),
         None,
         vec![],
     )
@@ -171,6 +173,10 @@ impl TableProvider for CustomDataSource {
 
     fn table_type(&self) -> TableType {
         TableType::Base
+    }
+
+    fn as_source(self: Arc<Self>) -> Arc<dyn TableSource> {
+        Arc::new(DefaultTableSource::new(self))
     }
 
     async fn scan(

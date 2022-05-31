@@ -61,9 +61,9 @@ use crate::datasource::listing::{ListingTableConfig, ListingTableUrl};
 use crate::datasource::TableProvider;
 use crate::error::{DataFusionError, Result};
 use crate::logical_plan::{
-    provider_as_source, CreateCatalog, CreateCatalogSchema, CreateExternalTable,
-    CreateMemoryTable, CreateView, DropTable, FileType, FunctionRegistry, LogicalPlan,
-    LogicalPlanBuilder, UNNAMED_TABLE,
+    CreateCatalog, CreateCatalogSchema, CreateExternalTable, CreateMemoryTable,
+    CreateView, DropTable, FileType, FunctionRegistry, LogicalPlan, LogicalPlanBuilder,
+    UNNAMED_TABLE,
 };
 use crate::optimizer::common_subexpr_eliminate::CommonSubexprEliminate;
 use crate::optimizer::filter_push_down::FilterPushDown;
@@ -635,7 +635,7 @@ impl SessionContext {
     pub fn read_table(&self, provider: Arc<dyn TableProvider>) -> Result<Arc<DataFrame>> {
         Ok(Arc::new(DataFrame::new(
             self.state.clone(),
-            &LogicalPlanBuilder::scan(UNNAMED_TABLE, provider_as_source(provider), None)?
+            &LogicalPlanBuilder::scan(UNNAMED_TABLE, provider.as_source(), None)?
                 .build()?,
         )))
     }
@@ -834,7 +834,7 @@ impl SessionContext {
             Some(ref provider) => {
                 let plan = LogicalPlanBuilder::scan(
                     table_ref.table(),
-                    provider_as_source(Arc::clone(provider)),
+                    Arc::clone(provider).as_source(),
                     None,
                 )?
                 .build()?;
@@ -1425,7 +1425,7 @@ impl ContextProvider for SessionState {
                         resolved_ref.catalog, resolved_ref.schema, resolved_ref.table
                     ))
                 })?;
-                Ok(provider_as_source(provider))
+                Ok(provider.as_source())
             }
             Err(e) => Err(e),
         }

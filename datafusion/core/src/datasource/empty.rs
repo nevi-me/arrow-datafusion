@@ -22,9 +22,11 @@ use std::sync::Arc;
 
 use arrow::datatypes::*;
 use async_trait::async_trait;
+use datafusion_expr::TableSource;
 
 use crate::datasource::{TableProvider, TableType};
 use crate::error::Result;
+use crate::logical_plan::plan::DefaultTableSource;
 use crate::logical_plan::Expr;
 use crate::physical_plan::project_schema;
 use crate::physical_plan::{empty::EmptyExec, ExecutionPlan};
@@ -53,6 +55,10 @@ impl TableProvider for EmptyTable {
 
     fn table_type(&self) -> TableType {
         TableType::Base
+    }
+
+    fn as_source(self: Arc<Self>) -> Arc<dyn TableSource> {
+        Arc::new(DefaultTableSource::new(self))
     }
 
     async fn scan(

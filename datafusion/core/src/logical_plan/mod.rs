@@ -55,7 +55,7 @@ pub use expr_rewriter::{
     ExprRewriter, RewriteRecursion,
 };
 pub use expr_simplier::{ExprSimplifiable, SimplifyInfo};
-pub use plan::{provider_as_source, source_as_provider};
+pub use plan::source_as_provider;
 pub use plan::{
     CreateCatalog, CreateCatalogSchema, CreateExternalTable, CreateMemoryTable,
     CreateView, CrossJoin, DropTable, EmptyRelation, FileType, JoinConstraint, JoinType,

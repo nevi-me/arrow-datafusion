@@ -19,10 +19,12 @@
 
 use crate::arrow::record_batch::RecordBatch;
 use crate::error::Result;
+use crate::logical_plan::plan::DefaultTableSource;
 use crate::logical_plan::{
     col, DFSchema, Expr, FunctionRegistry, JoinType, LogicalPlan, LogicalPlanBuilder,
     Partitioning,
 };
+use datafusion_expr::TableSource;
 use parquet::file::properties::WriterProperties;
 use std::sync::Arc;
 
@@ -628,6 +630,10 @@ impl TableProvider for DataFrame {
 
     fn table_type(&self) -> TableType {
         TableType::View
+    }
+
+    fn as_source(self: Arc<Self>) -> Arc<dyn TableSource> {
+        Arc::new(DefaultTableSource::new(self))
     }
 
     async fn scan(

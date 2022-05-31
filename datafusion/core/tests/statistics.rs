@@ -23,7 +23,7 @@ use arrow::datatypes::{DataType, Field, Schema, SchemaRef};
 use datafusion::{
     datasource::{TableProvider, TableType},
     error::Result,
-    logical_plan::Expr,
+    logical_plan::{plan::DefaultTableSource, Expr},
     physical_plan::{
         expressions::PhysicalSortExpr, project_schema, ColumnStatistics,
         DisplayFormatType, ExecutionPlan, Partitioning, SendableRecordBatchStream,
@@ -35,6 +35,7 @@ use datafusion::{
 
 use async_trait::async_trait;
 use datafusion::execution::context::TaskContext;
+use datafusion_expr::TableSource;
 
 /// This is a testing structure for statistics
 /// It will act both as a table provider and execution plan
@@ -70,6 +71,10 @@ impl TableProvider for StatisticsValidation {
 
     fn table_type(&self) -> TableType {
         TableType::Base
+    }
+
+    fn as_source(self: Arc<Self>) -> Arc<dyn TableSource> {
+        Arc::new(DefaultTableSource::new(self))
     }
 
     async fn scan(

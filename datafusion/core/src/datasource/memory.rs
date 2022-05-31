@@ -19,6 +19,7 @@
 //! queried by DataFusion. This allows data to be pre-loaded into memory and then
 //! repeatedly queried without incurring additional file I/O overhead.
 
+use datafusion_expr::TableSource;
 use futures::StreamExt;
 use std::any::Any;
 use std::sync::Arc;
@@ -30,6 +31,7 @@ use async_trait::async_trait;
 use crate::datasource::{TableProvider, TableType};
 use crate::error::{DataFusionError, Result};
 use crate::execution::context::TaskContext;
+use crate::logical_plan::plan::DefaultTableSource;
 use crate::logical_plan::Expr;
 use crate::physical_plan::common;
 use crate::physical_plan::memory::MemoryExec;
@@ -129,6 +131,10 @@ impl TableProvider for MemTable {
 
     fn table_type(&self) -> TableType {
         TableType::Base
+    }
+
+    fn as_source(self: Arc<Self>) -> Arc<dyn TableSource> {
+        Arc::new(DefaultTableSource::new(self))
     }
 
     async fn scan(

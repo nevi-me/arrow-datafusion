@@ -21,6 +21,7 @@ use std::any::Any;
 use std::sync::Arc;
 
 use async_trait::async_trait;
+use datafusion_expr::TableSource;
 pub use datafusion_expr::{TableProviderFilterPushDown, TableType};
 
 use crate::arrow::datatypes::SchemaRef;
@@ -40,6 +41,9 @@ pub trait TableProvider: Sync + Send {
 
     /// Get the type of this table for metadata/catalog purposes.
     fn table_type(&self) -> TableType;
+
+    /// Wrap the table provider in a [TableSource]
+    fn as_source(self: Arc<Self>) -> Arc<dyn TableSource>;
 
     /// Create an ExecutionPlan that will scan the table.
     /// The table provider will be usually responsible of grouping

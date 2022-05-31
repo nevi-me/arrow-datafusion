@@ -74,13 +74,6 @@ impl TableSource for DefaultTableSource {
     }
 }
 
-/// Wrap TableProvider in TableSource
-pub fn provider_as_source(
-    table_provider: Arc<dyn TableProvider>,
-) -> Arc<dyn TableSource> {
-    Arc::new(DefaultTableSource::new(table_provider))
-}
-
 /// Attempt to downcast a TableSource to DefaultTableSource and access the
 /// TableProvider. This will only work with a TableSource created by DataFusion.
 pub fn source_as_provider(

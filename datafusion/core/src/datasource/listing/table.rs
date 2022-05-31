@@ -21,18 +21,22 @@ use std::{any::Any, sync::Arc};
 
 use arrow::datatypes::{Field, Schema, SchemaRef};
 use async_trait::async_trait;
+use datafusion_expr::TableSource;
 use futures::{StreamExt, TryStreamExt};
 
-use crate::datasource::{
-    file_format::{
-        avro::AvroFormat, csv::CsvFormat, json::JsonFormat, parquet::ParquetFormat,
-        FileFormat,
-    },
-    get_statistics_with_limit,
-    listing::ListingTableUrl,
-    TableProvider, TableType,
-};
 use crate::logical_expr::TableProviderFilterPushDown;
+use crate::{
+    datasource::{
+        file_format::{
+            avro::AvroFormat, csv::CsvFormat, json::JsonFormat, parquet::ParquetFormat,
+            FileFormat,
+        },
+        get_statistics_with_limit,
+        listing::ListingTableUrl,
+        TableProvider, TableType,
+    },
+    logical_plan::plan::DefaultTableSource,
+};
 use crate::{
     error::{DataFusionError, Result},
     logical_plan::Expr,
@@ -298,6 +302,10 @@ impl TableProvider for ListingTable {
 
     fn table_type(&self) -> TableType {
         TableType::Base
+    }
+
+    fn as_source(self: Arc<Self>) -> Arc<dyn TableSource> {
+        Arc::new(DefaultTableSource::new(self))
     }
 
     async fn scan(
