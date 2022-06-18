@@ -21,7 +21,7 @@ use std::any::Any;
 use std::sync::Arc;
 
 use async_trait::async_trait;
-pub use datafusion_expr::{TableProviderFilterPushDown, TableType};
+pub use datafusion_expr::{TableOrigin, TableProviderFilterPushDown, TableType};
 
 use crate::arrow::datatypes::SchemaRef;
 use crate::error::Result;
@@ -45,6 +45,11 @@ pub trait TableProvider: Sync + Send {
     /// Get the create statement used to create this table, if available.
     fn get_table_definition(&self) -> Option<&str> {
         None
+    }
+    
+    /// The origin of this table
+    fn origin(&self) -> TableOrigin {
+        TableOrigin::Unspecified
     }
 
     /// Create an ExecutionPlan that will scan the table.

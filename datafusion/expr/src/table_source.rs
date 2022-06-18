@@ -49,6 +49,35 @@ pub enum TableType {
     Temporary,
 }
 
+/// Indicates the origin of this table for metadata/catalog purposes.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum TableOrigin {
+    /// A table/view/query from an external database.
+    Relational {
+        ///
+        server: Option<String>,
+        ///
+        database: Option<String>,
+        ///
+        schema: Option<String>,
+        ///
+        table: String,
+    },
+    /// A file on some file system
+    File {
+        ///
+        protocol: String,
+        ///
+        path: String,
+        ///
+        format: String,
+    },
+    /// A transient table.
+    InMemory,
+    /// An unspecified source, used as the default
+    Unspecified,
+}
+
 /// The TableSource trait is used during logical query planning and optimizations and
 /// provides access to schema information and filter push-down capabilities. This trait
 /// provides a subset of the functionality of the TableProvider trait in the core
@@ -66,6 +95,10 @@ pub trait TableSource: Sync + Send {
     /// Get the type of this table for metadata/catalog purposes.
     fn table_type(&self) -> TableType {
         TableType::Base
+    }
+
+    fn origin(&self) -> TableOrigin {
+        TableOrigin::Unspecified
     }
 
     /// Tests whether the table provider can make use of a filter expression

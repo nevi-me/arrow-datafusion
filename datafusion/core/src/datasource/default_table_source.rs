@@ -20,7 +20,7 @@
 use crate::datasource::TableProvider;
 use arrow::datatypes::SchemaRef;
 use datafusion_common::DataFusionError;
-use datafusion_expr::{Expr, TableProviderFilterPushDown, TableSource};
+use datafusion_expr::{Expr, TableOrigin, TableProviderFilterPushDown, TableSource};
 use std::any::Any;
 use std::sync::Arc;
 
@@ -50,6 +50,10 @@ impl TableSource for DefaultTableSource {
     /// Get a reference to the schema for this table
     fn schema(&self) -> SchemaRef {
         self.table_provider.schema()
+    }
+
+    fn origin(&self) -> TableOrigin {
+        self.table_provider.origin()
     }
 
     /// Tests whether the table provider can make use of a filter expression

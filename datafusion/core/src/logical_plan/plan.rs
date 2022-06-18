@@ -28,5 +28,5 @@ pub use datafusion_expr::{
         StringifiedPlan, Subquery, SubqueryAlias, TableScan, ToStringifiedPlan, Union,
         UserDefinedLogicalNode, Values, Window,
     },
-    TableProviderFilterPushDown, TableSource,
+    TableOrigin, TableProviderFilterPushDown, TableSource,
 };
